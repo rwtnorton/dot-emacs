@@ -85,7 +85,7 @@
 (require 'go-mode-load)
 (add-hook 'go-mode-hook
           '(lambda ()
-             (setq tab-width 4)))
+             (setq tab-width 8)))
 
 
 ;; loads ruby mode when a .rb file is opened.
