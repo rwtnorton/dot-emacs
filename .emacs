@@ -1,3 +1,5 @@
+(global-font-lock-mode t)
+
 ;; Inhibit all tabs.  Use C-q TAB to insert a tab.
 (setq-default indent-tabs-mode nil)
 ;(setq default-tab-width 2)
@@ -62,14 +64,34 @@
 (load "~/.emacs.d/elisp/feature-mode")
 
 (require 'color-theme)
-(add-to-list 'load-path "~/.emacs.d/themes")
+;(add-to-list 'load-path "~/.emacs.d/themes")
 (eval-after-load "color-theme"
-'(progn
- (color-theme-initialize)
- (color-theme-tty-dark)))
-;    (color-theme-tomorrow-night-bright)))
-;    (color-theme-hober)))
+  '(progn
+     (color-theme-initialize)
+;     (color-theme-emacs-nw)
+     (color-theme-tty-dark)
+;     (color-theme-hober)
+;     (color-theme-taming-mr-arneson)
+;     (color-theme-midnight)
+;     (color-theme-renegade)
+;     (color-theme-tomorrow-night-bright)
+;     (color-theme-blackboard)
+    ))
+
 (put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+(add-to-list 'load-path "~/src/adopted/go/misc/emacs" t)
+(require 'go-mode-load)
+(add-hook 'go-mode-hook
+          '(lambda ()
+             (setq tab-width 4)))
+
+
+;; loads ruby mode when a .rb file is opened.
+;;(autoload 'ruby-mode "ruby-mode" "Major mode for editing ruby scripts." t)
+;;(setq auto-mode-alist  (cons '(".rb$" . ruby-mode) auto-mode-alist))
+;;(setq auto-mode-alist  (cons '(".rhtml$" . html-mode) auto-mode-alist))
 
 (setq auto-mode-alist
   (append '(("\\.rjs$" . ruby-mode)) auto-mode-alist))
@@ -88,11 +110,33 @@
 
 (add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
 (load "magit")
-(put 'downcase-region 'disabled nil)
 
 (add-hook 'coffee-mode-hook
       '(lambda()
         (setq tab-width 2)))
+
+;loads ruby mode when a .rb file is opened.
+(add-to-list 'load-path "~/.emacs.d/")
+(autoload 'ruby-mode "ruby-mode" "Major mode for editing ruby scripts." t)
+(setq auto-mode-alist  (cons '(".rb$" . ruby-mode) auto-mode-alist))
+(setq auto-mode-alist  (cons '(".rhtml$" . html-mode) auto-mode-alist))
+
+(add-to-list 'load-path "~/.emacs.d/elisp/")
+(require 'feature-mode)
+(add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
+(require 'rspec-mode)
+(add-to-list 'auto-mode-alist '("\.rspec$" . rspec-mode))
+
+(add-hook 'objc-mode-hook
+          '(lambda ()
+             (setq tab-width 4)))
+
+;;; (add-hook 'c-mode-common-hook
+;;;           '(lambda ()
+;;;              (setq tab-width 4)
+;;;              ;(setq tab-stop-list (number-sequence 4 200 4))
+;;;              (setq c-basic-offset 4)
+;;;              ))
 
 ; (add-hook 'c-mode-hook
 ;           '(lambda()
@@ -100,37 +144,40 @@
 
 ;; Hooks defined by Linux coding style guide.
 (defun c-lineup-arglist-tabs-only (ignored)
-"Line up argument lists by tabs, not spaces"
-(let* ((anchor (c-langelem-pos c-syntactic-element))
-     (column (c-langelem-2nd-pos c-syntactic-element))
-     (offset (- (1+ column) anchor))
-     (steps (floor offset c-basic-offset)))
-(* (max steps 1)
-   c-basic-offset)))
+ "Line up argument lists by tabs, not spaces"
+ (let* ((anchor (c-langelem-pos c-syntactic-element))
+         (column (c-langelem-2nd-pos c-syntactic-element))
+         (offset (- (1+ column) anchor))
+         (steps (floor offset c-basic-offset)))
+   (* (max steps 1)
+      c-basic-offset)))
 
 (add-hook 'c-mode-common-hook
-      (lambda ()
-        ;; Add kernel style.
-        (c-add-style
-         "linux-tabs-only"
-         '("linux" (c-offsets-alist
-                    (arglist-cont-nonempty
-                     c-lineup-gcc-asm-reg
-                     c-lineup-arglist-tabs-only))))))
+         (lambda ()
+           ;; Add kernel style
+           (c-add-style
+            "linux-tabs-only"
+            '("linux" (c-offsets-alist
+                       (arglist-cont-nonempty
+                        c-lineup-gcc-asm-reg
+                        c-lineup-arglist-tabs-only))))))
 
 (add-hook 'c-mode-hook
-      (lambda ()
-        (let ((filename (buffer-file-name)))
-          ;; Enable kernel mode for the appropriate files
-          ; (when (and filename
-          ;            (string-match (expand-file-name "~/src/linux-trees")
-          ;                          filename))
-        (setq indent-tabs-mode t)
-        (c-set-style "linux-tabs-only"))))
+         (lambda ()
+           (let ((filename (buffer-file-name)))
+             ;; Enable kernel mode for the appropriate files
+;;;              (when (and filename
+;;;                         (string-match (expand-file-name "~/src/linux-trees")
+;;;                                       filename))
+               (setq indent-tabs-mode t)
+               (c-set-style "linux-tabs-only"))))
+;;;        )
 
-(add-to-list 'load-path "~/.emacs.d/elisp/jump")
+;(add-to-list 'load-path "~/.emacs.d/elisp/jump")
 (add-to-list 'load-path "~/.emacs.d/elisp/rinari")
 (require 'rinari)
+
+(require 'erlang-start)
 
 ;; MuMaMo-Mode for rhtml files.
 (add-to-list 'load-path "~/.emacs.d/nxhtml/util")
@@ -140,3 +187,18 @@
 (add-to-list 'auto-mode-alist '("\\.html\\.erb\\'" . eruby-html-mumamo))
 ;; Ditch the garish blue background.
 (setq mumamo-background-colors nil)
+
+;; lua-mode
+(add-to-list 'load-path "~/.emacs.d/site-list/lua")
+(autoload 'lua-mode "lua-mode" "Lua editing mode." t)
+(add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+(add-to-list 'interpreter-mode-alist '("lua" . lua-mode))
+
+(require 'quack)
+;(autoload 'quack-mode "quack-mode" "Major mode for editing racket." t)
+;(setq auto-mode-alist  (cons '(".rkt$" . quack-mode) auto-mode-alist))
+
+(add-to-list 'load-path "~/.emacs.d/elisp/haskell")
+(autoload 'haskell-mode "haskell-mode" "Haskell editing mode." t)
+(add-to-list 'auto-mode-alist '("\\.hs$" . haskell-mode))
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
