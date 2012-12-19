@@ -69,12 +69,13 @@
   '(progn
      (color-theme-initialize)
 ;     (color-theme-emacs-nw)
-     (color-theme-tty-dark)
+;     (color-theme-tty-dark)
 ;     (color-theme-hober)
 ;     (color-theme-taming-mr-arneson)
 ;     (color-theme-midnight)
 ;     (color-theme-renegade)
-;     (color-theme-tomorrow-night-bright)
+     (color-theme-tomorrow-night-bright)
+;     (color-theme-tomorrow-night)
 ;     (color-theme-blackboard)
     ))
 
