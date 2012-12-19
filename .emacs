@@ -36,8 +36,21 @@
 ;(setq whitespace-trailing-regexp
 ;      "\\b\\(\\(\t\\| \\|\xA0\\|\x8A0\\|\x920\\|\xE20\\|\xF20\\)+\\)$")
 ;; Turns on whitespace-mode for entire session.
-;(global-whitespace-mode)
+;(global-whitespace-mode t)
 ;(setq-default whitespace-style '(face trailing tabs tab-mark lines))
+(custom-set-faces
+ '(my-tab-face            ((((class color)) (:background "blue"))) t)
+ '(my-trailing-space-face ((((class color)) (:background "red"))) t)
+ '(my-long-line-face ((((class color)) (:background "color-52" :foreground "brightred"))) t)
+ )
+(add-hook 'font-lock-mode-hook
+          (function
+           (lambda ()
+             (setq font-lock-keywords
+                   (append font-lock-keywords
+                           '(("\t+" (0 'my-tab-face t))
+                             ("^.\\{80\\}\\(.*\\)$" (1 'my-long-line-face t))
+                             ("[ \t]+$"      (0 'my-trailing-space-face t))))))))
 
 ;; Inhibit the menu bar.
 (menu-bar-mode -1)
@@ -178,6 +191,9 @@
 (add-to-list 'load-path "~/.emacs.d/elisp/rinari")
 (require 'rinari)
 
+(setq load-path (cons "~/.emacs.d/erlang/lib/tools/emacs" load-path))
+(setq erlang-root-dir "~/.emacs.d/erlang")
+(setq exec-path (cons "~/.emacs.d/erlang/bin" exec-path))
 (require 'erlang-start)
 
 ;; MuMaMo-Mode for rhtml files.
