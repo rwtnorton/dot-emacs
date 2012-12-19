@@ -39,7 +39,7 @@
 ;(global-whitespace-mode t)
 ;(setq-default whitespace-style '(face trailing tabs tab-mark lines))
 (custom-set-faces
- '(my-tab-face            ((((class color)) (:background "blue"))) t)
+ '(my-tab-face            ((((class color)) (:background "color-236"))) t)
  '(my-trailing-space-face ((((class color)) (:background "red"))) t)
  '(my-long-line-face ((((class color)) (:background "color-52" :foreground "brightred"))) t)
  )
