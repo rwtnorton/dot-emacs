@@ -211,11 +211,38 @@
 (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
 (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))
 
+(load-file "~/.emacs.d/elisp/geiser/elisp/geiser.el")
 (require 'quack)
 ;(autoload 'quack-mode "quack-mode" "Major mode for editing racket." t)
 ;(setq auto-mode-alist  (cons '(".rkt$" . quack-mode) auto-mode-alist))
 
 (add-to-list 'load-path "~/.emacs.d/elisp/haskell")
+(load "haskell-site-file")
 (autoload 'haskell-mode "haskell-mode" "Haskell editing mode." t)
 (add-to-list 'auto-mode-alist '("\\.hs$" . haskell-mode))
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+
+;(add-to-list 'load-path "~/.emacs.d/elisp/evil")
+;(require 'evil)
+;(evil-mode 1)
+
+(autoload 'clojure-mode "clojure-mode" "Clojure editing mode." t)
+(add-to-list 'auto-mode-alist '("\\.clj$" . clojure-mode))
+
+(autoload 'nodejs-mode "nodejs-mode" "NodeJS editing mode." t)
+(add-to-list 'auto-mode-alist '("\\.node\\.js$" . nodejs-mode))
+(add-to-list 'auto-mode-alist '("\\.nodejs$" . nodejs-mode))
+
+;;(defun slime-tab ()
+;;  "slime-mode tab dwim, either indent, complete symbol or yas/expand"
+;;  (interactive)
+;;  'slime-indent-and-complete-symbol)
+;;  (let ((r (slime-indent-and-complete-symbol)))
+;;    (unless r
+;;      (yas/expand))))
+(defun my-slime-mode-hook ()
+  (interactive)
+  (define-key slime-mode-map (kbd "<tab>")
+;;    'slime-tab))
+    'slime-indent-and-complete-symbol))
+(add-hook 'slime-mode-hook 'my-slime-mode-hook)
