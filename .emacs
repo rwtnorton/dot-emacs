@@ -58,6 +58,9 @@
 ;; Enable display of column number for point.
 (setq-default column-number-mode t)
 
+;; Have cursor line always highlighted.
+(global-hl-line-mode 1)
+
 (add-to-list 'load-path "~/.emacs.d")
 
 ;;
