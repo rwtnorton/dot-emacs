@@ -3,6 +3,7 @@
 ;; Inhibit all tabs.  Use C-q TAB to insert a tab.
 (setq-default indent-tabs-mode nil)
 ;(setq default-tab-width 2)
+;(setq-default tab-width 4)
 
 ;; No startup message.
 (setq inhibit-startup-message t)
@@ -22,14 +23,45 @@
 ;; M-x set-variable RET show-t TAB RET nil RET
 (setq-default show-trailing-whitespace t)
 
+(global-auto-revert-mode 1)
+
 ;; No beep.
 (setq visible-bell t)
+;; No bell at all (to work around corrupt bell visuals).
+(setq ring-bell-function 'ignore)
 
 ;; Highlight matching brackets.
 (show-paren-mode 1)
 ; (setq show-paren-style 'mixed)
 
+;; No icon-ladden tool bar at the top.
+(tool-bar-mode -1)
+; (menu-bar-showhide-tool-bar-menu-customize-disable)
+
+;; Keep all opened files in the same frame.
+(setq ns-pop-up-frames nil)
+
+;; Disable scroll bars (appear on the right of each frame).
+(scroll-bar-mode -1)
+
 ;; To toggle a soft-wrap mode: M-x visual-line-mode
+
+(set-face-attribute 'default nil :height 150)
+
+;; (set-face-attribute 'default nil :font "M+ 1m" :height 200)
+;; (set-default-font "M+ 1m-14")
+(set-default-font "M+ 1m-18")
+;; (set-default-font "M+ 1m-20")
+;; (set-default-font "M+ 1m-24")
+;; (set-default-font "m+ 1m-22")
+;; (set-default-font "m+ 1m-28")
+;; (add-to-list 'default-frame-alist '(height . 35))
+;; (add-to-list 'default-frame-alist '(width . 181))
+(add-to-list 'default-frame-alist '(height . 24))
+(add-to-list 'default-frame-alist '(width . 120))
+
+;; Auto-close bracket insertion, including double-quotes.
+(electric-pair-mode 1)
 
 ;; M-x whitespace-mode RET
 ;(require 'whitespace)
@@ -38,18 +70,22 @@
 ;; Turns on whitespace-mode for entire session.
 ;(global-whitespace-mode t)
 ;(setq-default whitespace-style '(face trailing tabs tab-mark lines))
+
 (custom-set-faces
- '(my-tab-face            ((((class color)) (:background "color-236"))) t)
- '(my-trailing-space-face ((((class color)) (:background "red"))) t)
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(my-long-line-face ((((class color)) (:background "color-52" :foreground "brightred"))) t)
- )
+ '(my-tab-face ((t (:background "gray8"))) t)
+ '(my-trailing-space-face ((((class color)) (:background "grey8"))) t))
 (add-hook 'font-lock-mode-hook
           (function
            (lambda ()
              (setq font-lock-keywords
                    (append font-lock-keywords
                            '(("\t+" (0 'my-tab-face t))
-                             ("^.\\{80\\}\\(.*\\)$" (1 'my-long-line-face t))
+;                             ("^.\\{80\\}\\(.\\).*$" (1 'my-long-line-face t))
                              ("[ \t]+$"      (0 'my-trailing-space-face t))))))))
 
 ;; Inhibit the menu bar.
@@ -60,27 +96,49 @@
 
 ;; Have cursor line always highlighted.
 (global-hl-line-mode 1)
+;;(set-face-background 'hl-line "#111111")
+;;(set-face-foreground 'highlight nil)
 
-(add-to-list 'load-path "~/.emacs.d")
+;; Set cursor to I-beam.  (Ignored in the terminal.)
+(modify-all-frames-parameters (list (cons 'cursor-type 'bar)))
+
+(add-to-list 'load-path "~/.emacs.d/elisp")
+
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+(global-set-key [C-tab] 'other-window)
+(global-set-key [M-tab] 'switch-to-buffer)
+
+;; (set-default 'server-socket-dir "~/.emacs.d/server")
+;; (if (functionp 'window-system)
+;;   (when (and (window-system)
+;;              (>= emacs-major-version 24))
+;;     (server-start)))
+
+(require 'package)
+;; (add-to-list 'package-archives
+;;              '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives
+             '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
+
+(when (< emacs-major-version 24)
+  ;; For important compatibility libraries like cl-lib
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(package-initialize)
 
 ;;
 ;; Entries below this line will require installation of mode files.
 ;;
 
-(load "haml-mode")
-(load "sass-mode")
-(load "scss-mode")
-(load "coffee-mode")
-(load "yaml-mode")
-(load "markdown-mode")
-;(load "nxhtml/autostart.el") ; has funky blue bg and deprecation warnings.
-;(autoload 'html-helper-mode "html-helper-mode" "Yay HTML" t)
-;(setq auto-mode-alist (cons '("\\.html$" . html-helper-mode) auto-mode-alist))
-(add-to-list 'load-path "~/.emacs.d/elisp/feature-mode")
-(load "~/.emacs.d/elisp/feature-mode")
+(load (expand-file-name "~/lib/quicklisp/slime-helper.el"))
+(require 'slime-autoloads)
+(setq inferior-lisp-program "/usr/local/bin/sbcl")
+(setq slime-contribs '(slime-fancy))
 
 (require 'color-theme)
-;(add-to-list 'load-path "~/.emacs.d/themes")
 (eval-after-load "color-theme"
   '(progn
      (color-theme-initialize)
@@ -95,157 +153,103 @@
 ;     (color-theme-blackboard)
     ))
 
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
+;;(require 'paredit)
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+(add-hook 'clojure-mode-hook          #'enable-paredit-mode)
+(add-hook 'cider-repl-mode-hook       #'enable-paredit-mode)
 
-(add-to-list 'load-path "~/src/adopted/go/misc/emacs" t)
-(require 'go-mode-load)
+(add-hook 'prog-mode-hook 'paredit-everywhere-mode)
+
+
+(electric-pair-mode 1)
+
+
+(set-face-background 'hl-line "#223344")
+(set-face-foreground 'highlight nil)
+
+
+;; For GUI emacs, adds $PATH to exec-path.
+;; Part of package exec-path-from-shell.
+(exec-path-from-shell-initialize)
+
+(require 'rainbow-delimiters)
+(global-rainbow-delimiters-mode)
+
+(add-hook 'cider-repl-mode-hook
+          (lambda ()
+            (setq show-trailing-whitespace nil)))
+
+(setq auto-mode-alist (cons '("\\.adoc$" . adoc-mode) auto-mode-alist))
+
+
+(defun my-go-mode-hook ()
+  (setq tab-width 2 indent-tabs-mode 1)
+  (setq gofmt-command "goimports")
+  ;; eldoc shows the signature of the function at point in the status bar.
+  (go-eldoc-setup)
+  (local-set-key (kbd "M-.") #'godef-jump)
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  ;; (evil-mode 1)
+  (flycheck-mode)
+
+  ;; extra keybindings from https://github.com/bbatsov/prelude/blob/master/modules/prelude-go.el
+  (let ((map go-mode-map))
+    (define-key map (kbd "C-c a") 'go-test-current-project) ;; current package, really
+    (define-key map (kbd "C-c m") 'go-test-current-file)
+    (define-key map (kbd "C-c .") 'go-test-current-test)
+    (define-key map (kbd "C-c b") 'go-run)))
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+
+(require 'company)
+(require 'go-mode)
+(require 'company-go)
 (add-hook 'go-mode-hook
-          '(lambda ()
-             (setq tab-width 8)))
+          (lambda ()
+            (company-mode-on)
+            (set (make-local-variable 'company-backends) '(company-go))))
+
+(add-hook 'clojure-mode-hook
+          (lambda ()
+            (company-mode-on)))
+
+(add-hook 'cider-repl-mode-hook
+          (lambda ()
+            (local-set-key (kbd "C-c C-l") #'cider-repl-clear-buffer)
+            (setq cider-repl-display-help-banner nil)
+            (company-mode-on)))
+
+(defun my-kotlin-mode-hook ()
+  (setq kotlin-tab-width 4)
+  (kotlin-eldoc-setup)
+  (flycheck-mode))
+(add-hook 'kotlin-mode-hook 'my-kotlin-mode-hook)
+
+(add-hook 'groovy-mode-hook
+          (lambda ()
+            ;; (c-set-offset 'label 2)
+            (setq groovy-indent-offset 2)))
 
 
-;; loads ruby mode when a .rb file is opened.
-;;(autoload 'ruby-mode "ruby-mode" "Major mode for editing ruby scripts." t)
-;;(setq auto-mode-alist  (cons '(".rb$" . ruby-mode) auto-mode-alist))
-;;(setq auto-mode-alist  (cons '(".rhtml$" . html-mode) auto-mode-alist))
+;; https://www.reddit.com/r/rust/comments/a3da5g/my_entire_emacs_config_for_rust_in_fewer_than_20/
+(setq company-tooltip-align-annotations t)
+(setq company-minimum-prefix-length 1)
+(require 'lsp-clients)
+(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+;; done with rust stuff
 
-(setq auto-mode-alist
-  (append '(("\\.rjs$" . ruby-mode)) auto-mode-alist))
-(setq auto-mode-alist
-  (append '(("\\.rake$" . ruby-mode)) auto-mode-alist))
-(setq auto-mode-alist
-  (append '(("Rakefile$" . ruby-mode)) auto-mode-alist))
-(setq auto-mode-alist
-  (append '(("Gemfile$" . ruby-mode)) auto-mode-alist))
-(setq auto-mode-alist
-  (append '(("\\.md$" . ruby-mode)) auto-mode-alist))
-;; Avoid adding # -*- coding: utf-8 -*-
-(setq ruby-insert-encoding-magic-comment nil)
 
-(load "php-mode")
 
-(add-to-list 'load-path "/usr/local/share/emacs/site-lisp")
-(load "magit")
-
-(add-hook 'coffee-mode-hook
-      '(lambda()
-        (setq tab-width 2)))
-
-;loads ruby mode when a .rb file is opened.
-(add-to-list 'load-path "~/.emacs.d/")
-(autoload 'ruby-mode "ruby-mode" "Major mode for editing ruby scripts." t)
-(setq auto-mode-alist  (cons '(".rb$" . ruby-mode) auto-mode-alist))
-(setq auto-mode-alist  (cons '(".rhtml$" . html-mode) auto-mode-alist))
-
-(add-to-list 'load-path "~/.emacs.d/elisp/")
-(require 'feature-mode)
-(add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
-(require 'rspec-mode)
-(add-to-list 'auto-mode-alist '("\.rspec$" . rspec-mode))
-
-(add-hook 'objc-mode-hook
-          '(lambda ()
-             (setq tab-width 4)))
-
-;;; (add-hook 'c-mode-common-hook
-;;;           '(lambda ()
-;;;              (setq tab-width 4)
-;;;              ;(setq tab-stop-list (number-sequence 4 200 4))
-;;;              (setq c-basic-offset 4)
-;;;              ))
-
-; (add-hook 'c-mode-hook
-;           '(lambda()
-;             (setq tab-width 4)))
-
-;; Hooks defined by Linux coding style guide.
-(defun c-lineup-arglist-tabs-only (ignored)
- "Line up argument lists by tabs, not spaces"
- (let* ((anchor (c-langelem-pos c-syntactic-element))
-         (column (c-langelem-2nd-pos c-syntactic-element))
-         (offset (- (1+ column) anchor))
-         (steps (floor offset c-basic-offset)))
-   (* (max steps 1)
-      c-basic-offset)))
-
-(add-hook 'c-mode-common-hook
-         (lambda ()
-           ;; Add kernel style
-           (c-add-style
-            "linux-tabs-only"
-            '("linux" (c-offsets-alist
-                       (arglist-cont-nonempty
-                        c-lineup-gcc-asm-reg
-                        c-lineup-arglist-tabs-only))))))
-
-(add-hook 'c-mode-hook
-         (lambda ()
-           (let ((filename (buffer-file-name)))
-             ;; Enable kernel mode for the appropriate files
-;;;              (when (and filename
-;;;                         (string-match (expand-file-name "~/src/linux-trees")
-;;;                                       filename))
-               (setq indent-tabs-mode t)
-               (c-set-style "linux-tabs-only"))))
-;;;        )
-
-;(add-to-list 'load-path "~/.emacs.d/elisp/jump")
-(add-to-list 'load-path "~/.emacs.d/elisp/rinari")
-(require 'rinari)
-
-(setq load-path (cons "~/.emacs.d/erlang/lib/tools/emacs" load-path))
-(setq erlang-root-dir "~/.emacs.d/erlang")
-(setq exec-path (cons "~/.emacs.d/erlang/bin" exec-path))
-(require 'erlang-start)
-
-;; MuMaMo-Mode for rhtml files.
-(add-to-list 'load-path "~/.emacs.d/nxhtml/util")
-(require 'mumamo-fun)
-(setq mumamo-chunk-coloring 'submode-colored)
-(add-to-list 'auto-mode-alist '("\\.rhtml\\'" . eruby-html-mumamo))
-(add-to-list 'auto-mode-alist '("\\.html\\.erb\\'" . eruby-html-mumamo))
-;; Ditch the garish blue background.
-(setq mumamo-background-colors nil)
-
-;; lua-mode
-(add-to-list 'load-path "~/.emacs.d/site-list/lua")
-(autoload 'lua-mode "lua-mode" "Lua editing mode." t)
-(add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
-(add-to-list 'interpreter-mode-alist '("lua" . lua-mode))
-
-(load-file "~/.emacs.d/elisp/geiser/elisp/geiser.el")
-(require 'quack)
-;(autoload 'quack-mode "quack-mode" "Major mode for editing racket." t)
-;(setq auto-mode-alist  (cons '(".rkt$" . quack-mode) auto-mode-alist))
-
-(add-to-list 'load-path "~/.emacs.d/elisp/haskell")
-(load "haskell-site-file")
-(autoload 'haskell-mode "haskell-mode" "Haskell editing mode." t)
-(add-to-list 'auto-mode-alist '("\\.hs$" . haskell-mode))
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-
-;(add-to-list 'load-path "~/.emacs.d/elisp/evil")
-;(require 'evil)
-;(evil-mode 1)
-
-(autoload 'clojure-mode "clojure-mode" "Clojure editing mode." t)
-(add-to-list 'auto-mode-alist '("\\.clj$" . clojure-mode))
-
-(autoload 'nodejs-mode "nodejs-mode" "NodeJS editing mode." t)
-(add-to-list 'auto-mode-alist '("\\.node\\.js$" . nodejs-mode))
-(add-to-list 'auto-mode-alist '("\\.nodejs$" . nodejs-mode))
-
-;;(defun slime-tab ()
-;;  "slime-mode tab dwim, either indent, complete symbol or yas/expand"
-;;  (interactive)
-;;  'slime-indent-and-complete-symbol)
-;;  (let ((r (slime-indent-and-complete-symbol)))
-;;    (unless r
-;;      (yas/expand))))
-(defun my-slime-mode-hook ()
-  (interactive)
-  (define-key slime-mode-map (kbd "<tab>")
-;;    'slime-tab))
-    'slime-indent-and-complete-symbol))
-(add-hook 'slime-mode-hook 'my-slime-mode-hook)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (idris-mode clojure-mode-extra-font-locking clojure-mode flycheck-joker cljsbuild-mode ac-cider flycheck-kotlin kotlin-mode intero flycheck-haskell flycheck flycheck-clojure rust-playground haskell-snippets elixir-yasnippets elm-mode clojure-snippets racer paredit-everywhere bazel-mode emmet-mode which-key csharp-mode smartparens alchemist js2-mode coffee-mode yaml-mode vimrc-mode utop tuareg tt-mode toml-mode toml swift-mode sql-indent sml-mode slime slim-mode slamhound scala-mode sass-mode rust-mode requirejs-mode readline-complete rainbow-delimiters rainbow-blocks racket-mode python-mode py-isort py-import-check py-autopep8 pretty-mode pretty-lambdada pod-mode perlcritic paredit org nodejs-repl nginx-mode muttrc-mode mustache-mode mmm-mode merlin matlab-mode markdown-mode magit json-mode jedi javap-mode jade-mode inf-ruby inf-groovy hl-todo helm haskell-mode hackernews groovy-mode go-mode gist ghc fiplr exercism exec-path-from-shell evil ess-view ess-R-object-popup ess-R-data-view eshell-manual erlang epresent ensime emacs-cl elpy elixir-mode doctags dockerfile-mode django-mode cmake-mode cinspect cider cedit brainfuck-mode bison-mode bash-completion async applescript-mode apache-mode ansible adoc-mode))))
