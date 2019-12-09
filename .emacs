@@ -1,3 +1,5 @@
+(package-initialize)
+
 (global-font-lock-mode t)
 
 ;; Inhibit all tabs.  Use C-q TAB to insert a tab.
@@ -32,11 +34,10 @@
 
 ;; Highlight matching brackets.
 (show-paren-mode 1)
-; (setq show-paren-style 'mixed)
 
 ;; No icon-ladden tool bar at the top.
 (tool-bar-mode -1)
-; (menu-bar-showhide-tool-bar-menu-customize-disable)
+;; (menu-bar-showhide-tool-bar-menu-customize-disable)
 
 ;; Keep all opened files in the same frame.
 (setq ns-pop-up-frames nil)
@@ -47,6 +48,9 @@
 ;; To toggle a soft-wrap mode: M-x visual-line-mode
 
 (set-face-attribute 'default nil :height 150)
+
+;; Auto-close bracket insertion, including double-quotes.
+(electric-pair-mode 1)
 
 ;; (set-face-attribute 'default nil :font "M+ 1m" :height 200)
 ;; (set-default-font "M+ 1m-14")
@@ -63,14 +67,6 @@
 ;; Auto-close bracket insertion, including double-quotes.
 (electric-pair-mode 1)
 
-;; M-x whitespace-mode RET
-;(require 'whitespace)
-;(setq whitespace-trailing-regexp
-;      "\\b\\(\\(\t\\| \\|\xA0\\|\x8A0\\|\x920\\|\xE20\\|\xF20\\)+\\)$")
-;; Turns on whitespace-mode for entire session.
-;(global-whitespace-mode t)
-;(setq-default whitespace-style '(face trailing tabs tab-mark lines))
-
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -85,7 +81,7 @@
              (setq font-lock-keywords
                    (append font-lock-keywords
                            '(("\t+" (0 'my-tab-face t))
-;                             ("^.\\{80\\}\\(.\\).*$" (1 'my-long-line-face t))
+                             ;; ("^.\\{80\\}\\(.\\).*$" (1 'my-long-line-face t))
                              ("[ \t]+$"      (0 'my-trailing-space-face t))))))))
 
 ;; Inhibit the menu bar.
@@ -96,13 +92,11 @@
 
 ;; Have cursor line always highlighted.
 (global-hl-line-mode 1)
-;;(set-face-background 'hl-line "#111111")
-;;(set-face-foreground 'highlight nil)
 
 ;; Set cursor to I-beam.  (Ignored in the terminal.)
 (modify-all-frames-parameters (list (cons 'cursor-type 'bar)))
 
-(add-to-list 'load-path "~/.emacs.d/elisp")
+;; (add-to-list 'load-path "~/.emacs.d/elisp")
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
@@ -110,7 +104,13 @@
 (global-set-key [C-tab] 'other-window)
 (global-set-key [M-tab] 'switch-to-buffer)
 
-;; (set-default 'server-socket-dir "~/.emacs.d/server")
+(toggle-frame-maximized)
+;; (toggle-frame-fullscreen)
+
+(load "server")
+(set-default 'server-socket-dir "~/.emacs.d/server")
+(unless (server-running-p)
+  (server-start))
 ;; (if (functionp 'window-system)
 ;;   (when (and (window-system)
 ;;              (>= emacs-major-version 24))
@@ -138,20 +138,20 @@
 (setq inferior-lisp-program "/usr/local/bin/sbcl")
 (setq slime-contribs '(slime-fancy))
 
-(require 'color-theme)
-(eval-after-load "color-theme"
-  '(progn
-     (color-theme-initialize)
-;     (color-theme-emacs-nw)
-;     (color-theme-tty-dark)
-;     (color-theme-hober)
-;     (color-theme-taming-mr-arneson)
-;     (color-theme-midnight)
-;     (color-theme-renegade)
-     (color-theme-tomorrow-night-bright)
-;     (color-theme-tomorrow-night)
-;     (color-theme-blackboard)
-    ))
+;; (require 'color-theme)
+;; (eval-after-load "color-theme"
+;;   '(progn
+;;      (color-theme-initialize)
+;; ;     (color-theme-emacs-nw)
+;; ;     (color-theme-tty-dark)
+;; ;     (color-theme-hober)
+;; ;     (color-theme-taming-mr-arneson)
+;; ;     (color-theme-midnight)
+;; ;     (color-theme-renegade)
+;;      (color-theme-tomorrow-night-bright)
+;; ;     (color-theme-tomorrow-night)
+;; ;     (color-theme-blackboard)
+;;     ))
 
 ;;(require 'paredit)
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
@@ -164,11 +164,7 @@
 (add-hook 'clojure-mode-hook          #'enable-paredit-mode)
 (add-hook 'cider-repl-mode-hook       #'enable-paredit-mode)
 
-(add-hook 'prog-mode-hook 'paredit-everywhere-mode)
-
-
 (electric-pair-mode 1)
-
 
 (set-face-background 'hl-line "#223344")
 (set-face-foreground 'highlight nil)
@@ -178,15 +174,23 @@
 ;; Part of package exec-path-from-shell.
 (exec-path-from-shell-initialize)
 
-(require 'rainbow-delimiters)
-(global-rainbow-delimiters-mode)
+(load-theme 'sanityinc-tomorrow-night t)
+;; (load-theme 'material t)
+
+;; (require 'rainbow-delimiters)
+;; (global-rainbow-delimiters-mode)
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+
+(add-hook 'prog-mode-hook 'paredit-everywhere-mode)
 
 (add-hook 'cider-repl-mode-hook
           (lambda ()
             (setq show-trailing-whitespace nil)))
 
-(setq auto-mode-alist (cons '("\\.adoc$" . adoc-mode) auto-mode-alist))
+(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+(add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
 
+(setq auto-mode-alist (cons '("\\.adoc$" . adoc-mode) auto-mode-alist))
 
 (defun my-go-mode-hook ()
   (setq tab-width 2 indent-tabs-mode 1)
@@ -222,7 +226,13 @@
           (lambda ()
             (local-set-key (kbd "C-c C-l") #'cider-repl-clear-buffer)
             (setq cider-repl-display-help-banner nil)
-            (company-mode-on)))
+            (company-mode-on)
+            ;; (setq cider-default-cljs-repl 'nodejs)
+            ))
+
+;; (add-hook 'cider-mode-hook
+;;           (lambda ()
+;;             (set-variable cider-lein-parameters "with-profile +test repl")))
 
 (defun my-kotlin-mode-hook ()
   (setq kotlin-tab-width 4)
@@ -239,10 +249,16 @@
 ;; https://www.reddit.com/r/rust/comments/a3da5g/my_entire_emacs_config_for_rust_in_fewer_than_20/
 (setq company-tooltip-align-annotations t)
 (setq company-minimum-prefix-length 1)
-(require 'lsp-clients)
+;; (require 'lsp-clients)
 (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
 ;; done with rust stuff
 
+
+(counsel-mode 1)
+(global-set-key (kbd "C-c g") 'counsel-git)
+(global-set-key (kbd "C-c j") 'counsel-git-grep)
+(global-set-key (kbd "C-c k") 'counsel-ag)
+(global-set-key (kbd "C-c l") 'counsel-locate)
 
 
 (custom-set-variables
@@ -252,4 +268,4 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (idris-mode clojure-mode-extra-font-locking clojure-mode flycheck-joker cljsbuild-mode ac-cider flycheck-kotlin kotlin-mode intero flycheck-haskell flycheck flycheck-clojure rust-playground haskell-snippets elixir-yasnippets elm-mode clojure-snippets racer paredit-everywhere bazel-mode emmet-mode which-key csharp-mode smartparens alchemist js2-mode coffee-mode yaml-mode vimrc-mode utop tuareg tt-mode toml-mode toml swift-mode sql-indent sml-mode slime slim-mode slamhound scala-mode sass-mode rust-mode requirejs-mode readline-complete rainbow-delimiters rainbow-blocks racket-mode python-mode py-isort py-import-check py-autopep8 pretty-mode pretty-lambdada pod-mode perlcritic paredit org nodejs-repl nginx-mode muttrc-mode mustache-mode mmm-mode merlin matlab-mode markdown-mode magit json-mode jedi javap-mode jade-mode inf-ruby inf-groovy hl-todo helm haskell-mode hackernews groovy-mode go-mode gist ghc fiplr exercism exec-path-from-shell evil ess-view ess-R-object-popup ess-R-data-view eshell-manual erlang epresent ensime emacs-cl elpy elixir-mode doctags dockerfile-mode django-mode cmake-mode cinspect cider cedit brainfuck-mode bison-mode bash-completion async applescript-mode apache-mode ansible adoc-mode))))
+    (color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow clj-refactor idris-mode clojure-mode-extra-font-locking clojure-mode flycheck-joker cljsbuild-mode ac-cider flycheck-kotlin kotlin-mode intero flycheck-haskell flycheck flycheck-clojure rust-playground haskell-snippets elixir-yasnippets elm-mode clojure-snippets racer paredit-everywhere bazel-mode emmet-mode which-key csharp-mode smartparens alchemist js2-mode coffee-mode yaml-mode vimrc-mode utop tuareg tt-mode toml-mode toml swift-mode sql-indent sml-mode slime slim-mode slamhound scala-mode sass-mode rust-mode requirejs-mode readline-complete rainbow-delimiters rainbow-blocks racket-mode python-mode py-isort py-import-check py-autopep8 pretty-mode pretty-lambdada pod-mode perlcritic paredit org nodejs-repl nginx-mode muttrc-mode mustache-mode mmm-mode merlin matlab-mode markdown-mode magit json-mode jedi javap-mode jade-mode inf-ruby inf-groovy hl-todo helm haskell-mode hackernews groovy-mode go-mode gist ghc fiplr exercism exec-path-from-shell evil ess-view ess-R-object-popup ess-R-data-view eshell-manual erlang epresent ensime emacs-cl elpy elixir-mode doctags dockerfile-mode django-mode cmake-mode cinspect cider cedit brainfuck-mode bison-mode bash-completion async applescript-mode apache-mode ansible adoc-mode))))
