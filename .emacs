@@ -56,8 +56,8 @@
 
 ;; (set-frame-font "M+ 1m-16")
 ;; (set-frame-font "M+ 1m-18")
-;; (set-frame-font "M+ 1mn-14")
-(set-frame-font "M+ 1mn-16")
+(set-frame-font "M+ 1mn-14")
+;; (set-frame-font "M+ 1mn-16")
 ;; (set-frame-font "M+ 1mn-18")
 ;; (set-frame-font "M+ 1mn-20")
 
@@ -232,10 +232,13 @@
 (global-set-key [M-tab] 'switch-to-buffer)
 
 (counsel-mode 1)
-(global-set-key (kbd "C-c g") 'counsel-git)
-(global-set-key (kbd "C-c j") 'counsel-git-grep)
-(global-set-key (kbd "C-c k") 'counsel-ag)
-(global-set-key (kbd "C-c l") 'counsel-locate)
+(global-set-key (kbd "C-x M-s G") 'counsel-git)
+(global-set-key (kbd "C-x M-s g") 'counsel-git-grep)
+(global-set-key (kbd "C-x M-s a") 'counsel-ag)
+(global-set-key (kbd "C-x M-s l") 'counsel-locate)
+
+(global-set-key (kbd "C-x M-g s") 'magit-status)
+(global-set-key (kbd "C-x M-x s") 'shell)
 
 (require 'company)
 
