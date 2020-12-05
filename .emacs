@@ -239,6 +239,7 @@
 
 (global-set-key (kbd "C-x M-g s") 'magit-status)
 (global-set-key (kbd "C-x M-x s") 'shell)
+(global-set-key (kbd "C-x M-x c") 'compile)
 
 (require 'company)
 
